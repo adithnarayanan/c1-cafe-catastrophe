@@ -1,17 +1,17 @@
 from enum import Enum
 
-class Ingredient(Enum):
+class Ingredients(Enum):
     COFFEE_BEANS = 1
     MILK = 2
     SUGAR = 3
 
 class CoffeeTypes(Enum):
-    BLACK_COFFEE = 1
-    MILK_COFFEE = 2
-    SWEET_COFFEE = 3
-    SWEET_MILK_COFFEE = 4
+    BLACK_COFFEE = "Black Coffee"
+    MILK_COFFEE = "Milk Coffee"
+    SWEET_BLACK_COFFEE = "Sweet Black Coffee"
+    SWEET_MILK_COFFEE = "Sweet Milk Coffee"
 
-class Direction(Enum) :
+class Directions(Enum) :
     UP = 1
     DOWN = 2
     LEFT = 3
