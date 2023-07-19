@@ -36,7 +36,8 @@ coffeeBeansImg = pygame.image.load('src/assets/coffee-beans.png')
 milkImg = pygame.image.load('src/assets/milk.png')
 sugarImg = pygame.image.load('src/assets/sugar.png')
 coffeeMachineImg = pygame.image.load('src/assets/coffee-machine.png')
-ingredients_dict = {'COFFEE_BEANS': coffeeBeansImg, 'SUGAR': sugarImg, 'MILK': milkImg}
+coffeeImg = pygame.image.load('src/assets/coffee-cup.png')
+ingredients_dict = {'COFFEE_BEANS': coffeeBeansImg, 'SUGAR': sugarImg, 'MILK': milkImg, 'COFFEE': coffeeImg}
 bottomTableImages = [coffeeMachineImg, coffeeBeansImg, milkImg, sugarImg]
 
 # objects
@@ -67,7 +68,7 @@ def interact():
     if (player.currDirection == Directions.DOWN):
         #print("here")
         for i in range(4):
-            print(abs(player.x - interactionPointsX[i]))
+            #print(abs(player.x - interactionPointsX[i]))
             if (abs(player.x - interactionPointsX[i]) <= 50):
                 #print("here")
                 if (i == 0):
@@ -83,6 +84,9 @@ def interact():
                     player.tryToAdd(locationsToIngredientsDict[i])
     
     if (player.currDirection == Directions.UP):
+        for i in range(4):
+            if (abs(player.x - interactionPointsX[i]) <= 50):
+                print(i) #this i maps to customer line
         #handle customer interactions
         return None
 
@@ -96,10 +100,17 @@ def drawInventory(user_items):
     pygame.draw.rect(screen, INVENTORY_BORDER_COLOR, pygame.Rect(inv_x, inv_y, 100, 100))
     pygame.draw.rect(screen, INVENTORY_BG_COLOR, pygame.Rect(inv_x + img_offset, inv_y + img_offset, 80, 80))
     if len(user_items) > 0:
-        item = user_items[0].name
+        if (user_items[0] in Ingredients):
+            item = user_items[0].name
+        elif (user_items[0] in CoffeeTypes):
+            item = 'COFFEE'
         item_img = ingredients_dict[item]
         coords = item_img.get_rect().center
         showItemInInventory(ingredients_dict[item], inv_x + abs(50 - coords[0]), inv_y + abs(50 - coords[1]), item)
+        
+            # coords = item_img.get_rect().center
+            # print(coords)
+            # showItemInInventory(ingredients_dict[item], inv_x + abs(50 - coords[0]), inv_y + abs(50 - coords[1]), item)
 
 
 def drawAlert(text):
