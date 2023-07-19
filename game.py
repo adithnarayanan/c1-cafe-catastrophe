@@ -6,12 +6,20 @@ from lib.enums import Directions, Ingredients, CoffeeTypes
 
 pygame.init()
 
+# Vars
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 BACKGROUND_COLOR = (255, 198, 153)
 TABLE_COLOR = (140, 77, 10)
+ALERT_COLOR = (224, 224, 224)
 IMAGE_DIM = 64
 
+# Font stuff
+pygame.font.init() # you have to call this at the start, 
+                   # if you want to use this module.
+my_font = pygame.font.SysFont('Comic Sans MS', 30)
+
+# Main screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 #title and icon
@@ -75,6 +83,27 @@ def interact():
         #handle customer interactions
         return None
 
+images_dict = {}
+inventory = ['coffee', 'milk', 'sugar']
+def drawInventory(user_items):
+    inv_x, inv_y = 0, 0
+    desc_offset = 75
+    img_offset = 25
+
+    def showItemInInventory(image, x, y, item):
+        screen.blit(image, (x, y))
+        text_surface = my_font.render(f'{item}', False, (0, 0, 0))
+        screen.blit(text_surface, (x, y+desc_offset))
+
+    num_items = len(user_items)
+    pygame.draw.rect(screen, TABLE_COLOR, pygame.Rect(inv_x, inv_y, num_items * 100, 100))
+    
+    showItemInInventory(coffeeBeansImg, inv_x + img_offset, inv_y + img_offset, user_items[0])
+
+
+def drawAlert():
+    pygame.draw.rect(screen, ALERT_COLOR, pygame.Rect(SCREEN_WIDTH//2 - 0.125*SCREEN_WIDTH, SCREEN_HEIGHT//2 - 0.125*SCREEN_HEIGHT, 0.25*SCREEN_WIDTH, 0.25*SCREEN_HEIGHT))
+
 run = True
 
 clock = pygame.time.Clock()
@@ -83,6 +112,7 @@ while run:
 
     #draw screen
     screen.fill((BACKGROUND_COLOR))
+
 
     #draw two tables
     
@@ -108,10 +138,12 @@ while run:
             if event.key == pygame.K_RETURN:
                 interact()
             #player.tryToAdd()
-
+    drawInventory(inventory)
     drawTables()
     player.draw(screen)
     pygame.display.update()
     clock.tick(30)
+
+
 
 pygame.quit()
