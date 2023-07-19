@@ -11,11 +11,13 @@ SCREEN_HEIGHT = 600
 BACKGROUND_COLOR = (255, 198, 153)
 TABLE_COLOR = (140, 77, 10)
 IMAGE_DIM = 64
-
+ALERT_COLOR = (244, 244, 244)
+INVENTORY_BG_COLOR = (255, 255, 255)
+INVENTORY_BORDER_COLOR = (255, 102, 102)
 # Font stuff
 pygame.font.init() # you have to call this at the start, 
                    # if you want to use this module.
-my_font = pygame.font.SysFont('Comic Sans MS', 30)
+my_font = pygame.font.SysFont('Comic Sans MS', 10)
 
 # Main screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -31,7 +33,7 @@ coffeeBeansImg = pygame.image.load('src/assets/coffee-beans.png')
 milkImg = pygame.image.load('src/assets/milk.png')
 sugarImg = pygame.image.load('src/assets/sugar.png')
 coffeeMachineImg = pygame.image.load('src/assets/coffee-machine.png')
-
+ingredients_dict = {'COFFEE_BEANS': coffeeBeansImg, 'SUGAR': sugarImg, 'MILK': milkImg}
 bottomTableImages = [coffeeMachineImg, coffeeBeansImg, milkImg, sugarImg]
 
 player = Player(SCREEN_WIDTH/2, 400, 250, 750)
@@ -75,19 +77,21 @@ def checkForCollisions():
 
 images_dict = {}
 def drawInventory(user_items):
-    inv_x, inv_y = 0, 0
-    desc_offset = 75
-    img_offset = 25
+    inv_x, inv_y = 15, 15
+    img_offset = 10
 
     def showItemInInventory(image, x, y, item):
         screen.blit(image, (x, y))
-        text_surface = my_font.render(f'{item}', False, (0, 0, 0))
-        screen.blit(text_surface, (x, y+desc_offset))
 
     num_items = len(user_items)
-    pygame.draw.rect(screen, TABLE_COLOR, pygame.Rect(inv_x, inv_y, num_items * 100, 100))
-    
-    showItemInInventory(playerImg, inv_x + img_offset, inv_y + img_offset, user_items[0])
+    pygame.draw.rect(screen, INVENTORY_BORDER_COLOR, pygame.Rect(inv_x, inv_y, 100, 100))
+    pygame.draw.rect(screen, INVENTORY_BG_COLOR, pygame.Rect(inv_x + img_offset, inv_y + img_offset, 80, 80))
+    if len(user_items) > 0:
+        item = user_items[0].name
+        item_img = ingredients_dict[item]
+        coords = item_img.get_rect().center
+        print(coords)
+        showItemInInventory(ingredients_dict[item], inv_x + abs(50 - coords[0]), inv_y + abs(50 - coords[1]), item)
 
 
 def drawAlert():
@@ -129,6 +133,7 @@ while run:
             #player.tryToAdd()
 
     drawTables()
+    drawInventory(player.inventory)
     player.draw(screen)
     pygame.display.update()
     clock.tick(30)
