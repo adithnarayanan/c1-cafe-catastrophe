@@ -1,3 +1,4 @@
 
 *.pyc
 *.pyc
+src/__pycache__/__init__.cpython-311.pyc
