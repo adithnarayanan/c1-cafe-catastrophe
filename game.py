@@ -1,7 +1,8 @@
 import pygame
 
 from src.player import Player
-from lib.enums import Directions, Ingredients
+from lib.coffee_machine import CoffeeMachine
+from lib.enums import Directions, Ingredients, CoffeeTypes
 
 pygame.init()
 
@@ -10,6 +11,7 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 BACKGROUND_COLOR = (255, 198, 153)
 TABLE_COLOR = (140, 77, 10)
+ALERT_COLOR = (224, 224, 224)
 IMAGE_DIM = 64
 ALERT_COLOR = (244, 244, 244)
 INVENTORY_BG_COLOR = (255, 255, 255)
@@ -36,7 +38,9 @@ coffeeMachineImg = pygame.image.load('src/assets/coffee-machine.png')
 ingredients_dict = {'COFFEE_BEANS': coffeeBeansImg, 'SUGAR': sugarImg, 'MILK': milkImg}
 bottomTableImages = [coffeeMachineImg, coffeeBeansImg, milkImg, sugarImg]
 
+# objects
 player = Player(SCREEN_WIDTH/2, 400, 250, 750)
+coffeeMachine = CoffeeMachine()
 
 interactionPointsX = [312.5, 437.5, 562.5, 687.5]
 
@@ -55,19 +59,25 @@ def drawTables():
         screen.blit(img, (curr_width, bottomTableY))
         curr_width += 125
 
-def checkForCollisions():
+def interact():
     print("checking for collisions")
     
     print(player.currDirection)
     if (player.currDirection == Directions.DOWN):
-        print("here")
+        #print("here")
         for i in range(4):
             print(abs(player.x - interactionPointsX[i]))
             if (abs(player.x - interactionPointsX[i]) <= 50):
-                print("here")
+                #print("here")
                 if (i == 0):
                     #coffee machine interaction
-                    return None
+                    coffee_or_none = coffeeMachine.add_ingredient(player.inventory[0])
+                    if coffee_or_none in CoffeeTypes:
+                        print("******")
+                        player.inventory[0] = coffee_or_none
+                    elif coffee_or_none in Ingredients:
+                        player.inventory.clear()
+                    
                 else:
                     player.tryToAdd(locationsToIngredientsDict[i])
     
@@ -76,6 +86,7 @@ def checkForCollisions():
         return None
 
 images_dict = {}
+inventory = ['coffee', 'milk', 'sugar']
 def drawInventory(user_items):
     inv_x, inv_y = 15, 15
     img_offset = 10
@@ -129,9 +140,9 @@ while run:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                checkForCollisions()
+                interact()
             #player.tryToAdd()
-
+    drawInventory(inventory)
     drawTables()
     drawInventory(player.inventory)
     player.draw(screen)
