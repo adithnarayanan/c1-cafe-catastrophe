@@ -3,6 +3,7 @@ import pygame
 from src.player import Player
 from lib.coffee_machine import CoffeeMachine
 from lib.enums import Directions, Ingredients, CoffeeTypes
+from lib.customer_handler import CustomerHandler
 
 pygame.init()
 
@@ -13,10 +14,10 @@ BACKGROUND_COLOR = (255, 198, 153)
 TABLE_COLOR = (140, 77, 10)
 ALERT_COLOR = (224, 224, 224)
 IMAGE_DIM = 64
-ALERT_COLOR = (244, 244, 244)
 ALERT_COLOR_BORDER = (87, 87, 87)
 INVENTORY_BG_COLOR = (255, 255, 255)
 INVENTORY_BORDER_COLOR = (255, 102, 102)
+
 # Font stuff
 pygame.font.init() # you have to call this at the start, 
                    # if you want to use this module.
@@ -43,6 +44,7 @@ bottomTableImages = [coffeeMachineImg, coffeeBeansImg, milkImg, sugarImg]
 # objects
 player = Player(SCREEN_WIDTH/2, 400, 250, 750)
 coffeeMachine = CoffeeMachine()
+customerHandler = CustomerHandler()
 
 interactionPointsX = [312.5, 437.5, 562.5, 687.5]
 
@@ -86,9 +88,25 @@ def interact():
     if (player.currDirection == Directions.UP):
         for i in range(4):
             if (abs(player.x - interactionPointsX[i]) <= 50):
-                print(i) #this i maps to customer line
+                if (len(customerHandler.lines[i]) > 0 and len(player.inventory) > 0 and player.inventory[0] in CoffeeTypes):
+                    print("HERERERERERERE")
+                    #print 
+                    if (customerHandler.lines[i][0].order == player.inventory[0]):
+                        #asdf
+                        score = customerHandler.pop_customer_from_line(i).max_wait_time
+                        player.addPoints(score)
+                        player.inventory.clear()
+                    else:
+                        customerHandler.pop_customer_from_line(i)
+                        player.wrongOrder()
+                #print(i) #this i maps to customer line
         #handle customer interactions
         return None
+
+def displayPoints(points):
+    text = "Points: " + str(points)
+    text_surface = my_font.render(text, False, (0, 0, 0))
+    screen.blit(text_surface, (800, 20))
 
 def drawInventory(user_items):
     inv_x, inv_y = 15, 15
@@ -128,6 +146,12 @@ run = True
 
 clock = pygame.time.Clock()
 
+#time stuff
+SPAWNEVENT, spawntime = pygame.USEREVENT+1, 5000
+UPDATEEVENT, updatetime = pygame.USEREVENT+2, 1000
+pygame.time.set_timer(SPAWNEVENT, spawntime)
+pygame.time.set_timer(UPDATEEVENT, updatetime)
+
 while run:
 
     #draw screen
@@ -157,13 +181,21 @@ while run:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 interact()
+
+        if event.type == SPAWNEVENT:
+            customerHandler.spawn_cust()
+
+        if event.type == UPDATEEVENT:
+            points_to_dec = customerHandler.decrement_time()
+            player.customersLeft(points_to_dec)
             #player.tryToAdd()
     
     drawTables()
     drawInventory(player.inventory)
-
+    customerHandler.drawCustomers(screen, interactionPointsX, 150 + IMAGE_DIM/2)
     player.draw(screen)
-    drawAlert('alert message')
+    displayPoints(player.points)
+    #drawAlert('alert message')
     pygame.display.update()
     clock.tick(30)
 

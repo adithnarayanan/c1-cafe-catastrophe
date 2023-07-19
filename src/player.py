@@ -7,11 +7,14 @@ from lib.enums import Directions, Ingredients
 class Player:
     PLAYER_MOVEMENT_SPEED = 5
     IMAGE_DIM = 64
+    WRONG_ORDER_DECREMENT = 2
+    CUSTOMER_LEFT_DECREMENT = 2
     
     lookingUpImg = load('sprites/boy_up.png')
     lookingDownImg = load('sprites/boy_down.png')
     lookingLeftImg = load('sprites/boy_left.png')
     lookingRightImg = load('sprites/boy_right.png')
+    points = 0
 
 
     imgDict = {Directions.UP: lookingUpImg, Directions.DOWN: lookingDownImg, Directions.LEFT: lookingLeftImg, Directions.RIGHT: lookingRightImg}
@@ -54,6 +57,15 @@ class Player:
             return None
         else:
             self.inventory.append(ingredient)
+
+    def addPoints(self, n):
+        self.points = self.points + n
+
+    def wrongOrder(self):
+        self.points = self.points - self.WRONG_ORDER_DECREMENT
+
+    def customersLeft(self, n):
+        self.points = self.points - n * self.CUSTOMER_LEFT_DECREMENT
 
     def draw(self, screen):
         screen.blit(self.imgDict[self.currDirection], (self.x - self.IMAGE_DIM/2, self.y - self.IMAGE_DIM/2))
