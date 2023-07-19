@@ -36,7 +36,8 @@ coffeeBeansImg = pygame.image.load('src/assets/coffee-beans.png')
 milkImg = pygame.image.load('src/assets/milk.png')
 sugarImg = pygame.image.load('src/assets/sugar.png')
 coffeeMachineImg = pygame.image.load('src/assets/coffee-machine.png')
-coffeeImg = pygame.image.load('src/assets/coffee-cup.png')
+# coffeeImg = pygame.image.load('src/assets/coffee-cup.png')
+coffeeImg = pygame.image.load('src/assets/coffee-machine.png')
 ingredients_dict = {'COFFEE_BEANS': coffeeBeansImg, 'SUGAR': sugarImg, 'MILK': milkImg, 'COFFEE': coffeeImg}
 bottomTableImages = [coffeeMachineImg, coffeeBeansImg, milkImg, sugarImg]
 
@@ -107,24 +108,25 @@ def drawInventory(user_items):
         item_img = ingredients_dict[item]
         coords = item_img.get_rect().center
         showItemInInventory(ingredients_dict[item], inv_x + abs(50 - coords[0]), inv_y + abs(50 - coords[1]), item)
-        
-            # coords = item_img.get_rect().center
-            # print(coords)
-            # showItemInInventory(ingredients_dict[item], inv_x + abs(50 - coords[0]), inv_y + abs(50 - coords[1]), item)
 
 
-def drawAlert(text):
+def showAlert(text) -> None:
     alert_width, alert_height = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
     x_offset, y_offset = abs(SCREEN_WIDTH//2 - alert_width // 2), abs(SCREEN_HEIGHT//2 - alert_height //2)
     border_size = 10
-
-    pygame.draw.rect(screen, ALERT_COLOR_BORDER, pygame.Rect(x_offset, y_offset, alert_width, alert_height))
-    pygame.draw.rect(screen, ALERT_COLOR, pygame.Rect(x_offset + border_size, y_offset + border_size, alert_width- 2 * border_size, alert_height - 2 * border_size))
-
+    border = pygame.Rect(x_offset, y_offset, alert_width, alert_height)
+    inner = pygame.Rect(x_offset + border_size, y_offset + border_size, alert_width- 2 * border_size, alert_height - 2 * border_size)
+    pygame.draw.rect(screen, ALERT_COLOR_BORDER, border)
+    pygame.draw.rect(screen, ALERT_COLOR, inner)
     text_surface = my_font.render(text, False, (0, 0, 0))
     screen.blit(text_surface, (x_offset + 2 * border_size, y_offset + 2 * border_size))
 
+
+
 run = True
+alert_flag = False
+
+show_alert_logic = True
 
 clock = pygame.time.Clock()
 
@@ -149,7 +151,7 @@ while run:
     player.handleMovement(key)
 
     player.clearInventory(key)
-    
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -158,12 +160,19 @@ while run:
             if event.key == pygame.K_RETURN:
                 interact()
             #player.tryToAdd()
-    
+            if show_alert_logic:
+                alert_flag = True
+            if event.key == pygame.K_1 and alert_flag:
+                alert_flag = False
+                show_alert_logic = False # just to stop the inf loop
+
+
     drawTables()
     drawInventory(player.inventory)
-
+    if alert_flag:
+        showAlert('alert')
     player.draw(screen)
-    drawAlert('alert message')
+    
     pygame.display.update()
     clock.tick(30)
 
