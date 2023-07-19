@@ -1,7 +1,8 @@
 import pygame
 
 from src.player import Player
-from lib.enums import Directions, Ingredients
+from lib.coffee_machine import CoffeeMachine
+from lib.enums import Directions, Ingredients, CoffeeTypes
 
 pygame.init()
 
@@ -27,7 +28,9 @@ coffeeMachineImg = pygame.image.load('src/assets/coffee-machine.png')
 
 bottomTableImages = [coffeeMachineImg, coffeeBeansImg, milkImg, sugarImg]
 
+# objects
 player = Player(SCREEN_WIDTH/2, 400, 250, 750)
+coffeeMachine = CoffeeMachine()
 
 interactionPointsX = [312.5, 437.5, 562.5, 687.5]
 
@@ -46,19 +49,25 @@ def drawTables():
         screen.blit(img, (curr_width, bottomTableY))
         curr_width += 125
 
-def checkForCollisions():
+def interact():
     print("checking for collisions")
     
     print(player.currDirection)
     if (player.currDirection == Directions.DOWN):
-        print("here")
+        #print("here")
         for i in range(4):
             print(abs(player.x - interactionPointsX[i]))
             if (abs(player.x - interactionPointsX[i]) <= 50):
-                print("here")
+                #print("here")
                 if (i == 0):
                     #coffee machine interaction
-                    return None
+                    coffee_or_none = coffeeMachine.add_ingredient(player.inventory[0])
+                    if coffee_or_none in CoffeeTypes:
+                        print("******")
+                        player.inventory[0] = coffee_or_none
+                    elif coffee_or_none in Ingredients:
+                        player.inventory.clear()
+                    
                 else:
                     player.tryToAdd(locationsToIngredientsDict[i])
     
@@ -97,7 +106,7 @@ while run:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                checkForCollisions()
+                interact()
             #player.tryToAdd()
 
     drawTables()
